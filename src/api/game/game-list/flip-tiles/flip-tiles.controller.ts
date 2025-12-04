@@ -102,4 +102,32 @@ export const FlipTilesController = Router()
         return next(error);
       }
     },
+  )
+  .delete(
+    '/:game_id',
+    validateAuth({}),
+    async (
+      request: AuthedRequest<{ game_id: string }>,
+      response: Response,
+      next: NextFunction,
+    ) => {
+      try {
+        const result = await FlipTilesService.deleteFlipTiles(
+          request.params.game_id,
+          request.user!.user_id,
+          request.user!.role,
+        );
+        const successResponse = new SuccessResponse(
+          StatusCodes.OK,
+          'Flip Tiles game deleted successfully',
+          result,
+        );
+
+        return response
+          .status(successResponse.statusCode)
+          .json(successResponse.json());
+      } catch (error) {
+        return next(error);
+      }
+    },
   );

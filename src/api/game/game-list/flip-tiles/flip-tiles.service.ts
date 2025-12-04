@@ -199,4 +199,39 @@ export abstract class FlipTilesService {
 
     return gameTemplate.id;
   }
+
+  static async deleteFlipTiles(
+    game_id: string,
+    user_id: string,
+    user_role: ROLE,
+  ) {
+    const game = await prisma.games.findUnique({
+      where: { id: game_id },
+      select: {
+        id: true,
+        thumbnail_image: true,
+        creator_id: true,
+        game_template: {
+          select: { slug: true },
+        },
+      },
+    });
+
+    if (!game || game.game_template.slug !== this.flipTilesSlug)
+      throw new ErrorResponse(StatusCodes.NOT_FOUND, 'Game not found');
+
+    if (user_role !== 'SUPER_ADMIN' && game.creator_id !== user_id)
+      throw new ErrorResponse(
+        StatusCodes.FORBIDDEN,
+        'User cannot delete this game',
+      );
+
+    if (game.thumbnail_image) {
+      await FileManager.remove(game.thumbnail_image);
+    }
+
+    await prisma.games.delete({ where: { id: game_id } });
+
+    return { id: game_id };
+  }
 }
