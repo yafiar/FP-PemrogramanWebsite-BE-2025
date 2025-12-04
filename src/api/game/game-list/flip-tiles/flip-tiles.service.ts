@@ -166,7 +166,10 @@ export abstract class FlipTilesService {
       },
     });
 
-    return updatedGame;
+    return {
+      ...updatedGame,
+      creator_id: undefined,
+    };
   }
 
   private static async existGameCheck(name: string) {
