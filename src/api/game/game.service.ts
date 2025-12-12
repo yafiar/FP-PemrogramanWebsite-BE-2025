@@ -155,7 +155,8 @@ export abstract class GameService {
 
     if (!game) throw new ErrorResponse(StatusCodes.NOT_FOUND, 'Game not found');
 
-    if (user_role !== 'SUPER_ADMIN' || game.creator_id !== user_id)
+    // Allow SUPER_ADMIN or the creator; forbid others
+    if (user_role !== 'SUPER_ADMIN' && game.creator_id !== user_id)
       throw new ErrorResponse(
         StatusCodes.FORBIDDEN,
         'User not allowed to edit this data',

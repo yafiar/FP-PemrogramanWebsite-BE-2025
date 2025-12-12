@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
+import { v4 as uuidv4 } from 'uuid';
 import type { ROLE } from '@prisma/client';
 
 import { ErrorResponse, prisma } from '@/common';
@@ -12,6 +13,18 @@ export abstract class FlipTilesService {
   static async createFlipTiles(data: ICreateFlipTiles, creator_id: string) {
     try {
       return await prisma.$transaction(async (tx) => {
+        const existByName = await tx.games.findUnique({
+          where: { name: data.title },
+          select: { id: true },
+        });
+
+        if (existByName) {
+          throw new ErrorResponse(
+            StatusCodes.BAD_REQUEST,
+            'Game name is already used',
+          );
+        }
+
         const gameTemplate = await tx.gameTemplates.findFirst({
           where: { slug: this.FLIP_TILES_SLUG },
         });
@@ -23,12 +36,21 @@ export abstract class FlipTilesService {
           );
         }
 
+        const newGameId = uuidv4();
+
+        const thumbnailImagePath = await FileManager.upload(
+          `game/flip-tiles/${newGameId}`,
+          data.thumbnail,
+        );
+
         const newGame = await tx.games.create({
           data: {
+            id: newGameId,
             name: data.title,
             description: data.description || '',
             creator_id,
             game_template_id: gameTemplate.id,
+            thumbnail_image: thumbnailImagePath,
             game_json: {
               tiles: data.tiles,
             },
@@ -136,6 +158,19 @@ export abstract class FlipTilesService {
           updateData.game_json = {
             tiles: data.tiles,
           };
+        }
+
+        if (data.thumbnail) {
+          if (game.thumbnail_image) {
+            await FileManager.remove(game.thumbnail_image);
+          }
+
+          const thumbnailImagePath = await FileManager.upload(
+            `game/flip-tiles/${game_id}`,
+            data.thumbnail,
+          );
+
+          updateData.thumbnail_image = thumbnailImagePath;
         }
 
         const updatedGame = await tx.games.update({

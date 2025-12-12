@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { fileSchema } from '@/common';
 
 const TileSchema = z.object({
   id: z.string().optional(),
@@ -9,6 +10,7 @@ const TileSchema = z.object({
 export const CreateFlipTilesSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
+  thumbnail: fileSchema({}),
   tiles: z
     .string()
     .transform((val) => JSON.parse(val))
@@ -18,6 +20,7 @@ export const CreateFlipTilesSchema = z.object({
 export const UpdateFlipTilesSchema = z.object({
   title: z.string().min(1, 'Title is required').optional(),
   description: z.string().optional(),
+  thumbnail: fileSchema({}).optional(),
   tiles: z
     .string()
     .transform((val) => JSON.parse(val))
