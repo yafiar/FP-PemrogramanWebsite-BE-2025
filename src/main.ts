@@ -1,6 +1,7 @@
 /* eslint-disable unicorn/prefer-module */
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -12,6 +13,7 @@ import { ErrorHandler } from './common';
 
 dotenv.config({ quiet: true });
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadPath = path.join(__dirname, '..', 'uploads');
 mkdir(uploadPath, { recursive: true });
 
