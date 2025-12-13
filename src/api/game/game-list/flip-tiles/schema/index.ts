@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { fileSchema } from '@/common';
 
 const TileSchema = z.object({
@@ -12,11 +13,11 @@ const TilesInput = z
   .union([
     z
       .string()
-      .transform((val) => JSON.parse(val))
+      .transform(value => JSON.parse(value) as unknown)
       .pipe(z.array(TileSchema)),
     z.array(TileSchema),
   ])
-  .refine((arr) => arr.length >= 2, {
+  .refine(array => array.length >= 2, {
     message: 'At least 2 tiles are required',
   });
 
