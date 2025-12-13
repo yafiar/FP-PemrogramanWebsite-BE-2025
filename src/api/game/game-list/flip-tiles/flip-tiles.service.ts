@@ -85,7 +85,7 @@ export abstract class FlipTilesService {
         throw new ErrorResponse(StatusCodes.NOT_FOUND, 'Game not found');
       }
 
-      if (game.game_template.slug !== this.FLIP_TILES_SLUG) {
+      if (!game.game_template || game.game_template.slug !== this.FLIP_TILES_SLUG) {
         throw new ErrorResponse(
           StatusCodes.BAD_REQUEST,
           'Game is not a Flip Tiles game',
@@ -134,7 +134,7 @@ export abstract class FlipTilesService {
           throw new ErrorResponse(StatusCodes.NOT_FOUND, 'Game not found');
         }
 
-        if (game.game_template.slug !== this.FLIP_TILES_SLUG) {
+        if (!game.game_template || game.game_template.slug !== this.FLIP_TILES_SLUG) {
           throw new ErrorResponse(
             StatusCodes.BAD_REQUEST,
             'Game is not a Flip Tiles game',
@@ -205,7 +205,7 @@ export abstract class FlipTilesService {
           throw new ErrorResponse(StatusCodes.NOT_FOUND, 'Game not found');
         }
 
-        if (game.game_template.slug !== this.FLIP_TILES_SLUG) {
+        if (!game.game_template || game.game_template.slug !== this.FLIP_TILES_SLUG) {
           throw new ErrorResponse(
             StatusCodes.BAD_REQUEST,
             'Game is not a Flip Tiles game',
@@ -239,4 +239,4 @@ export abstract class FlipTilesService {
       );
     }
   }
-}
+
